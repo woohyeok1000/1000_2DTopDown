@@ -13,19 +13,26 @@ public class TopDownController : MonoBehaviour // 캐릭터와 몬스터의 공통적인 기�
 
     private float timeSinceLastAttack = float.MaxValue;
 
+    // protected 사용하는 이유 : set 은 여기서만 하고싶고, get 은 상속받는 클래스들이 할 수 있게
+    protected CharacterStatHandler stats { get; private set; }
+
+    protected virtual void Awake()
+    {
+        stats = GetComponent<CharacterStatHandler>();
+    }
+
     private void Update()
     {
         HandleAttackDelay();
     }
 
     private void HandleAttackDelay()
-    {
-        // To do : Magic number 수정
-        if(timeSinceLastAttack < 0.2f)
+    {        
+        if(timeSinceLastAttack < stats.CurrentStat.attackSO.delay)
         {
             timeSinceLastAttack += Time.deltaTime;
         }
-        else if(IsAttacking && timeSinceLastAttack >= 0.2f)
+        else if(IsAttacking && timeSinceLastAttack >= stats.CurrentStat.attackSO.delay)
         {
             timeSinceLastAttack = 0f;
             CallAttackEvent();
@@ -45,5 +52,5 @@ public class TopDownController : MonoBehaviour // 캐릭터와 몬스터의 공통적인 기�
     private void CallAttackEvent()
     {
         OnAttackEvent?.Invoke();
-    }
+    }   
 }
